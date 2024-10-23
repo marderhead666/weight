@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gewichtsänderung</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label, input {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        input[type="number"], input[type="date"] {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+
+        .green {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .red {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .icon {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .motivating {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gewichts-Tracker</h1>
+    <form id="gewichtForm">
+        <label for="datum">Datum:</label>
+        <input type="date" id="datum" required>
+
+        <label for="gewicht">Gewicht (kg):</label>
+        <input type="number" id="gewicht" required>
+
+        <input type="submit" value="Speichern">
+    </form>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        let lastWeight = null;
+
+        document.getElementById('gewichtForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const datum = document.getElementById('datum').value;
+            const gewicht = parseFloat(document.getElementById('gewicht').value);
+            const resultDiv = document.getElementById('result');
+
+            if (lastWeight !== null) {
+                const difference = gewicht - lastWeight;
+                if (difference < 0) {
+                    resultDiv.innerHTML = `<span class="icon">💪</span> Super, du hast ${Math.abs(difference)} kg abgenommen!`;
+                    resultDiv.className = 'result green';
+                } else if (difference > 0) {
+                    resultDiv.innerHTML = `<span class="icon">⚠️</span> Du hast ${difference} kg zugenommen!`;
+                    resultDiv.className = 'result red';
+                } else {
+                    resultDiv.innerHTML = `<span class="icon">👌</span> Kein Gewichtsverlust oder Zunahme.`;
+                    resultDiv.className = 'result';
+                }
+            }
+
+            // Speichern in eine Textdatei (dieser Teil muss auf der Serverseite z.B. mit PHP gemacht werden)
+            const data = `${datum}, ${gewicht}kg\n`;
+            saveToFile(data);
+
+            lastWeight = gewicht;
+        });
+
+        function saveToFile(data) {
+            const a = document.createElement('a');
+            const file = new Blob([data], { type: 'text/plain' });
+            a.href = URL.createObjectURL(file);
+            a.download = 'gewichtsdaten.txt';
+            a.click();
+        }
+    </script>
+</body>
+</html>
